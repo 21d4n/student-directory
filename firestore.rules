@@ -1,0 +1,54 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Helper ----------
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function myRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isSuperAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && myRole() == 'super_admin';
+    }
+
+    // ---------- Profil & role ----------
+    match /users/{uid} {
+      // Setiap user hanya boleh membaca profilnya sendiri.
+      allow read: if signedIn() && request.auth.uid == uid;
+
+      // Saat login pertama, app hanya boleh membuat profil dirinya dengan
+      // role default 'user'. Role super_admin di-set manual dari Console.
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.role == 'user'
+        && request.resource.data.email is string;
+
+      // User boleh memperbarui profilnya sendiri, tetapi TIDAK boleh
+      // mengubah role maupun uid.
+      allow update: if signedIn()
+        && request.auth.uid == uid
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'uid']);
+
+      // Penghapusan hanya lewat Console / Admin SDK.
+      allow delete: if false;
+    }
+
+    // ---------- Data mahasiswa ----------
+    match /mahasiswa/{id} {
+      allow read: if signedIn();        // semua user login boleh melihat
+      allow write: if isSuperAdmin();   // hanya super admin boleh mengubah
+    }
+
+    // Sisanya tertutup.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

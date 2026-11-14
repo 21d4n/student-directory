@@ -45,3 +45,6 @@ example
 
 # firebase config
 .env
+
+# IDE
+.idea/

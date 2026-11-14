@@ -19,7 +19,7 @@ import { subscribeStudents } from '@/services/studentService';
 import type { Student } from '@/types/student';
 
 export default function HomeScreen() {
-  const { user, initializing } = useAuth();
+  const { user, role, initializing } = useAuth();
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -80,6 +80,13 @@ export default function HomeScreen() {
             <Text className="text-xs text-slate-500" numberOfLines={1}>
               {user.email}
             </Text>
+            {role === 'super_admin' && (
+              <View className="mt-1 self-start rounded-full bg-brand-50 px-2 py-0.5">
+                <Text className="text-[10px] font-semibold uppercase tracking-wide text-brand-700">
+                  Super Admin
+                </Text>
+              </View>
+            )}
           </View>
         </View>
 

@@ -8,6 +8,7 @@ import {
   signInWithCredential,
   signInWithEmailAndPassword,
   signOut,
+  updatePassword,
   type User,
 } from 'firebase/auth';
 
@@ -77,6 +78,27 @@ export async function linkPasswordToCurrentUser(password: string) {
 
   const credential = EmailAuthProvider.credential(currentUser.email, password);
   return linkWithCredential(currentUser, credential);
+}
+
+/** Mengganti password akun yang sudah punya provider email/password. */
+export async function changePassword(password: string) {
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    throw new Error('Kamu harus login terlebih dahulu.');
+  }
+
+  return updatePassword(currentUser, password);
+}
+
+/**
+ * Dipakai halaman Akun: memasang password kalau belum ada, atau mengganti
+ * password kalau provider email/password sudah ter-link.
+ */
+export function savePasswordForCurrentUser(password: string) {
+  return hasPasswordProvider(auth.currentUser)
+    ? changePassword(password)
+    : linkPasswordToCurrentUser(password);
 }
 
 export async function signOutFromApp() {

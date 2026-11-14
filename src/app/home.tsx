@@ -1,4 +1,4 @@
-import { Redirect } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -61,7 +61,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#f6f7fb]" edges={['top', 'left', 'right']}>
-      <View className="flex-row items-center justify-between pb-4 pl-5 pr-20 pt-2">
+      <View className="flex-row items-center justify-between pb-4 pl-5 pr-5 pt-2">
         <View className="flex-1 flex-row items-center">
           {user.photoURL ? (
             <Image
@@ -91,7 +91,13 @@ export default function HomeScreen() {
         </View>
 
         <Pressable
-          className={`ml-3 rounded-xl border border-slate-200 bg-white px-4 py-2 ${
+          className="ml-3 rounded-xl border border-slate-200 bg-white px-4 py-2"
+          onPress={() => router.push('/account')}>
+          <Text className="text-sm font-semibold text-slate-700">Akun</Text>
+        </Pressable>
+
+        <Pressable
+          className={`ml-2 rounded-xl border border-slate-200 bg-white px-4 py-2 ${
             loggingOut ? 'opacity-50' : ''
           }`}
           disabled={loggingOut}
